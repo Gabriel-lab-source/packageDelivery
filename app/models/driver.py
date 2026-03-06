@@ -8,6 +8,7 @@ class Driver(db.Model):
     phone = db.Column(db.String(13), nullable=False)
     vehicle = db.Column(db.String(20), nullable=False)
     active = db.Column(db.Boolean, default=True)
+    packages = db.relationship("Package", backref="driver")
 
     def to_dict(self):
         return {

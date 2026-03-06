@@ -1,0 +1,22 @@
+from app import db
+from datetime import datetime, timezone
+
+
+class Package(db.Model):
+    __tablename__ = "packages"
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(150), nullable=False)
+    address = db.Column(db.String(150), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    driver_id = db.Column(db.Integer, db.ForeignKey("drivers.id"))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "description": self.description,
+            "address": self.address,
+            "status": self.status,
+            "driver_id": self.driver_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }

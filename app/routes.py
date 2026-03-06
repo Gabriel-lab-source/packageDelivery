@@ -3,6 +3,7 @@ from app.models.driver import Driver
 from flask import request
 from flask import jsonify
 from sqlalchemy import select
+from app.models.package import Package
 
 
 def init_routes(app):
@@ -15,7 +16,7 @@ def init_routes(app):
         return {"status": "ok"}
 
     @app.route("/drivers", methods=["POST"])
-    def drivers():
+    def insert_drivers():
         data = request.get_json()
         driver = Driver(
             name=data.get("name"),
@@ -61,3 +62,23 @@ def init_routes(app):
         db.session.delete(driver)
         db.session.commit()
         return {"message": "deleted"}
+
+    @app.route("/packages", methods=["POST"])
+    def insert_packages():
+        data = request.get_json()
+        driver = db.session.get(Driver, data.get("driver_id"))
+        package = Package(
+            description=data.get("description"),
+            address=data.get("address"),
+            status=data.get("status"),
+            driver=driver
+        )
+        db.session.add(package)
+        db.session.commit()
+        return {"message": "created"}, 201
+
+    @app.route("/packages", methods=["GET"])
+    def list_packages():
+        packages = db.session.scalars(select(Package)).all()
+        dict_packages = [package.to_dict() for package in packages]
+        return jsonify(dict_packages)
