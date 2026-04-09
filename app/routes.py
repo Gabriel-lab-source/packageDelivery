@@ -3,7 +3,7 @@ from app.models.driver import Driver
 from flask import request
 from flask import jsonify
 from sqlalchemy import select
-from app.models.deliveries import Delivery
+from app.models.delivery import Delivery
 from app.services.geolocation import get_coordinates
 from app.services.geolocation import calculate_distance
 
@@ -103,6 +103,8 @@ def init_routes(app):
             origin_address=data.get("origin_address"),
             origin_lat=origin_lat,
             origin_lng=origin_lng,
+            current_lat=origin_lat,
+            current_lng=origin_lng,
             destination_address=data.get("destination_address"),
             destination_lat=destination_lat,
             destination_lng=destination_lng,
@@ -189,19 +191,19 @@ def init_routes(app):
 
         return jsonify(deliveries)
 
-    @app.route("/deliveries/<int:id>/distance", methods=["GET"])
-    def get_delivery_distance(id):
+    @app.route("/deliveries/<int:id>/remaining-distance", methods=["GET"])
+    def get_remaining_distance(id):
         delivery = db.session.get(Delivery, id)
 
         if not delivery:
             return {"error": "Delivery not found"}, 404
 
-        if not delivery.origin_lat or not delivery.destination_lat:
-            return {"error": "Location not available"}, 400
+        if not delivery.current_lat:
+            return {"error": "Current location not available"}, 400
 
         distance = calculate_distance(
-            delivery.origin_lat,
-            delivery.origin_lng,
+            delivery.current_lat,
+            delivery.current_lng,
             delivery.destination_lat,
             delivery.destination_lng
         )
@@ -210,3 +212,19 @@ def init_routes(app):
             "delivery_id": delivery.id,
             "distance_km": round(distance, 2)
         }
+
+    @app.route("/deliveries/<int:id>/location", methods=["PUT"])
+    def update_delivery_location(id):
+        delivery = db.session.get(Delivery, id)
+
+        if not delivery:
+            return {"error": "Delivery not found"}, 404
+
+        data = request.get_json()
+
+        delivery.current_lat = data.get("lat")
+        delivery.current_lng = data.get("lng")
+
+        db.session.commit()
+
+        return {"message": "Location updated"}
