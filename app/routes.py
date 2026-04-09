@@ -4,6 +4,8 @@ from flask import request
 from flask import jsonify
 from sqlalchemy import select
 from app.models.deliveries import Delivery
+from app.services.geolocation import get_coordinates
+from app.services.geolocation import calculate_distance
 
 
 def init_routes(app):
@@ -90,13 +92,20 @@ def init_routes(app):
     @app.route("/deliveries", methods=["POST"])
     def insert_deliveries():
         data = request.get_json()
+        print(data)
+        origin_lat, origin_lng = get_coordinates(data.get("origin_address"))
+        destination_lat, destination_lng = get_coordinates(data.get("destination_address"))
 
         driver = db.session.get(Driver, data.get("driver_id"))
 
         delivery = Delivery(
             description=data.get("description"),
             origin_address=data.get("origin_address"),
+            origin_lat=origin_lat,
+            origin_lng=origin_lng,
             destination_address=data.get("destination_address"),
+            destination_lat=destination_lat,
+            destination_lng=destination_lng,
             status=data.get("status"),
             driver=driver
         )
@@ -179,3 +188,25 @@ def init_routes(app):
         deliveries = [package.to_dict() for package in driver.deliveries]
 
         return jsonify(deliveries)
+
+    @app.route("/deliveries/<int:id>/distance", methods=["GET"])
+    def get_delivery_distance(id):
+        delivery = db.session.get(Delivery, id)
+
+        if not delivery:
+            return {"error": "Delivery not found"}, 404
+
+        if not delivery.origin_lat or not delivery.destination_lat:
+            return {"error": "Location not available"}, 400
+
+        distance = calculate_distance(
+            delivery.origin_lat,
+            delivery.origin_lng,
+            delivery.destination_lat,
+            delivery.destination_lng
+        )
+
+        return {
+            "delivery_id": delivery.id,
+            "distance_km": round(distance, 2)
+        }
