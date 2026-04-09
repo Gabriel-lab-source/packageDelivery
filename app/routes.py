@@ -3,7 +3,7 @@ from app.models.driver import Driver
 from flask import request
 from flask import jsonify
 from sqlalchemy import select
-from app.models.package import Package
+from app.models.deliveries import Delivery
 
 
 def init_routes(app):
@@ -87,36 +87,37 @@ def init_routes(app):
 
         return {"message": "deleted"}
 
-    @app.route("/packages", methods=["POST"])
-    def insert_packages():
+    @app.route("/deliveries", methods=["POST"])
+    def insert_deliveries():
         data = request.get_json()
 
         driver = db.session.get(Driver, data.get("driver_id"))
 
-        package = Package(
+        delivery = Delivery(
             description=data.get("description"),
-            address=data.get("address"),
+            origin_address=data.get("origin_address"),
+            destination_address=data.get("destination_address"),
             status=data.get("status"),
             driver=driver
         )
 
-        db.session.add(package)
+        db.session.add(delivery)
 
         db.session.commit()
 
         return {"message": "created"}, 201
 
-    @app.route("/packages", methods=["GET"])
-    def list_packages():
+    @app.route("/deliveries", methods=["GET"])
+    def list_deliveries():
 
-        packages = db.session.scalars(select(Package)).all()
-        dict_packages = [package.to_dict() for package in packages]
-        return jsonify(dict_packages)
+        deliveries = db.session.scalars(select(Delivery)).all()
+        dict_deliveries = [package.to_dict() for package in deliveries]
+        return jsonify(dict_deliveries)
 
-    @app.route("/packages/<int:id>", methods=["GET"])
+    @app.route("/deliveries/<int:id>", methods=["GET"])
     def get_package(id):
 
-        package = db.session.get(Package, id)
+        package = db.session.get(Delivery, id)
 
         if not package:
             return {"error": "Package not found"}, 404
@@ -124,36 +125,39 @@ def init_routes(app):
         result = package.to_dict()
         return jsonify(result)
 
-    @app.route("/packages/<int:id>", methods=["PUT"])
+    @app.route("/deliveries/<int:id>", methods=["PUT"])
     def edit_package(id):
 
-        package = db.session.get(Package, id)
+        delivery = db.session.get(Delivery, id)
 
-        if not package:
+        if not delivery:
             return {"error": "Package not found"}, 404
 
         data = request.get_json()
 
         if "description" in data:
-            package.description = data["description"]
+            delivery.description = data["description"]
 
-        if "address" in data:
-            package.address = data["address"]
+        if "origin_address" in data:
+            delivery.origin_address = data["origin_address"]
+
+        if "destination_address" in data:
+            delivery.destination_address = data["destination_address"]
 
         if "status" in data:
-            package.status = data["status"]
+            delivery.status = data["status"]
 
-        if "driver_id" in data:
-            package.driver_id = data["driver_id"]
+        if "driver" in data:
+            delivery.driver_id = data["driver"]
 
         db.session.commit()
 
-        return jsonify(package.to_dict())
+        return jsonify(delivery.to_dict())
 
-    @app.route("/drivers/<int:id>", methods=["DELETE"])
+    @app.route("/deliveries/<int:id>", methods=["DELETE"])
     def delete_package(id):
 
-        package = db.session.get(Package, id)
+        package = db.session.get(Delivery, id)
 
         if not package:
             return {"error": "Package not found"}, 404
@@ -164,4 +168,14 @@ def init_routes(app):
 
         return {"message": "deleted"}
 
-    
+    @app.route("/drivers/<int:id>/deliveries", methods=["GET"])
+    def get_driver_deliveries(id):
+
+        driver = db.session.get(Driver, id)
+
+        if not driver:
+            return {"error": "Driver not found"}, 404
+
+        deliveries = [package.to_dict() for package in driver.deliveries]
+
+        return jsonify(deliveries)
