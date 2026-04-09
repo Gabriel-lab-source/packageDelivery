@@ -2,6 +2,7 @@ from app import db
 
 
 class Driver(db.Model):
+
     __tablename__ = "drivers"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +18,7 @@ class Driver(db.Model):
     deliveries = db.relationship("Delivery", backref="driver")
 
     def to_dict(self):
+
         return {
             "id": self.id,
             "name": self.name,

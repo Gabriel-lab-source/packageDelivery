@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 
 class Delivery(db.Model):
+
     __tablename__ = "deliveries"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -32,6 +33,7 @@ class Delivery(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def to_dict(self):
+
         return {
             "id": self.id,
             "description": self.description,

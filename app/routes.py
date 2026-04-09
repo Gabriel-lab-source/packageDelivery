@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.models.delivery import Delivery
 from app.services.geolocation import get_coordinates
 from app.services.geolocation import calculate_distance
-
+from app.services.geolocation import estimate_time
 
 def init_routes(app):
     @app.route("/")
@@ -122,27 +122,27 @@ def init_routes(app):
     def list_deliveries():
 
         deliveries = db.session.scalars(select(Delivery)).all()
-        dict_deliveries = [package.to_dict() for package in deliveries]
+        dict_deliveries = [deliveries.to_dict() for deliveries in deliveries]
         return jsonify(dict_deliveries)
 
     @app.route("/deliveries/<int:id>", methods=["GET"])
-    def get_package(id):
+    def get_deliveries(id):
 
-        package = db.session.get(Delivery, id)
+        deliveries = db.session.get(Delivery, id)
 
-        if not package:
-            return {"error": "Package not found"}, 404
+        if not deliveries:
+            return {"error": "deliveries not found"}, 404
 
-        result = package.to_dict()
+        result = deliveries.to_dict()
         return jsonify(result)
 
     @app.route("/deliveries/<int:id>", methods=["PUT"])
-    def edit_package(id):
+    def edit_deliveries(id):
 
         delivery = db.session.get(Delivery, id)
 
         if not delivery:
-            return {"error": "Package not found"}, 404
+            return {"error": "deliveries not found"}, 404
 
         data = request.get_json()
 
@@ -166,14 +166,14 @@ def init_routes(app):
         return jsonify(delivery.to_dict())
 
     @app.route("/deliveries/<int:id>", methods=["DELETE"])
-    def delete_package(id):
+    def delete_deliveries(id):
 
-        package = db.session.get(Delivery, id)
+        deliveries = db.session.get(Delivery, id)
 
-        if not package:
-            return {"error": "Package not found"}, 404
+        if not deliveries:
+            return {"error": "deliveries not found"}, 404
 
-        db.session.delete(package)
+        db.session.delete(deliveries)
 
         db.session.commit()
 
@@ -187,11 +187,11 @@ def init_routes(app):
         if not driver:
             return {"error": "Driver not found"}, 404
 
-        deliveries = [package.to_dict() for package in driver.deliveries]
+        deliveries = [deliveries.to_dict() for deliveries in driver.deliveries]
 
         return jsonify(deliveries)
 
-    @app.route("/deliveries/<int:id>/remaining-distance", methods=["GET"])
+    @app.route("/deliveries/<int:id>/eta", methods=["GET"])
     def get_remaining_distance(id):
         delivery = db.session.get(Delivery, id)
 
@@ -208,9 +208,12 @@ def init_routes(app):
             delivery.destination_lng
         )
 
+        eta = estimate_time(distance)
+
         return {
             "delivery_id": delivery.id,
-            "distance_km": round(distance, 2)
+            "distance_km": round(distance, 2),
+            "eta_minutes": eta
         }
 
     @app.route("/deliveries/<int:id>/location", methods=["PUT"])
