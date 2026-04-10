@@ -5,8 +5,8 @@ from flask import jsonify
 from sqlalchemy import select
 from app.models.delivery import Delivery
 from app.services.geolocation import get_coordinates
-from app.services.geolocation import calculate_distance
-from app.services.geolocation import estimate_time
+from app.services.geolocation import get_route
+
 
 def init_routes(app):
     @app.route("/")
@@ -191,8 +191,8 @@ def init_routes(app):
 
         return jsonify(deliveries)
 
-    @app.route("/deliveries/<int:id>/eta", methods=["GET"])
-    def get_remaining_distance(id):
+    @app.route("/deliveries/<int:id>/real-eta", methods=["GET"])
+    def get_real_eta(id):
         delivery = db.session.get(Delivery, id)
 
         if not delivery:
@@ -201,19 +201,20 @@ def init_routes(app):
         if not delivery.current_lat:
             return {"error": "Current location not available"}, 400
 
-        distance = calculate_distance(
+        distance, duration = get_route(
             delivery.current_lat,
             delivery.current_lng,
             delivery.destination_lat,
             delivery.destination_lng
         )
 
-        eta = estimate_time(distance)
+        if not distance:
+            return {"error": "Could not calculate route"}, 400
 
         return {
             "delivery_id": delivery.id,
             "distance_km": round(distance, 2),
-            "eta_minutes": eta
+            "eta_minutes": round(duration)
         }
 
     @app.route("/deliveries/<int:id>/location", methods=["PUT"])

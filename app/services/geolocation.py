@@ -2,6 +2,31 @@ import requests
 import math
 
 
+def get_route(lat1, lon1, lat2, lon2):
+    url = "https://api.openrouteservice.org/v2/directions/driving-car"
+
+    headers = {
+        "Authorization": "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjQ3NmZjMWRmMTgyYjRmYjM4YTg0NjM3MjNmNDI5YjU3IiwiaCI6Im11cm11cjY0In0=",
+        "Content-Type": "application/json"
+    }
+
+    body = {
+        "coordinates": [
+            [lon1, lat1],
+            [lon2, lat2]
+        ]
+    }
+
+    response = requests.post(url, json=body, headers=headers)
+
+    data = response.json()
+
+    distance = data["routes"][0]["summary"]["distance"] / 1000
+    duration = data["routes"][0]["summary"]["duration"] / 60
+
+    return distance, duration
+
+
 def get_coordinates(address):
     url = "https://nominatim.openstreetmap.org/search"
 
@@ -28,36 +53,3 @@ def get_coordinates(address):
     lon = data[0]["lon"]
 
     return lat, lon
-
-
-def calculate_distance(lat1, lon1, lat2, lon2):
-    R = 6371  # raio da Terra em km
-
-    lat1 = float(lat1)
-    lon1 = float(lon1)
-    lat2 = float(lat2)
-    lon2 = float(lon2)
-
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-
-    a = (
-        math.sin(dlat / 2) ** 2
-        + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2))
-        * math.sin(dlon / 2) ** 2
-    )
-
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    return R * c
-
-
-def estimate_time(distance_km, speed_kmh=30):
-    if not distance_km:
-        return 0
-
-    hours = distance_km / speed_kmh
-    minutes = hours * 60
-
-    return round(minutes)
