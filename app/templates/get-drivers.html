@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Motoristas Cadastrados{% endblock %}
+
+{% block content %}
+    <h1>Lista de Motoristas</h1>
+
+    <ul>
+        {% for driver in drivers %}
+            <li>
+                <strong>{{ driver.name }}</strong><br>
+                📞 {{ driver.phone }} <br>
+                🚗 {{ driver.vehicle }} <br><br>
+                
+                <a href="/edit-driver/{{ driver.id }}">Editar</a>
+            
+                <form action="/delete-driver/{{ driver.id }}" method="POST" style="display:inline;">
+                    <button type="submit">Excluir</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

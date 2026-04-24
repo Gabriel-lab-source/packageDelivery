@@ -1,11 +1,9 @@
 from app import db
 from app.models.driver import Driver
-from flask import request
-from flask import jsonify
-from sqlalchemy import select
 from app.models.delivery import Delivery
-from app.services.geolocation import get_coordinates
-from app.services.geolocation import get_route
+from app.services.geolocation import get_coordinates, get_route
+from sqlalchemy import select
+from flask import request, jsonify, render_template, flash, redirect, url_for
 
 
 def init_routes(app):
@@ -17,33 +15,32 @@ def init_routes(app):
     def health():
         return {"status": "ok"}
 
-    @app.route("/drivers", methods=["POST"])
-    def insert_drivers():
+    @app.route("/create-driver", methods=["GET", "POST"])
+    def create_driver():
 
-        data = request.get_json()
+        if request.method == "POST":
+            new_driver = Driver(
+                name=request.form.get("name"),
+                phone=request.form.get("phone"),
+                vehicle=request.form.get("vehicle")
+            )
 
-        driver = Driver(
-            name=data.get("name"),
-            phone=data.get("phone"),
-            vehicle=data.get("vehicle"))
+            db.session.add(new_driver)
+            db.session.commit()
 
-        db.session.add(driver)
+            return redirect(url_for("create_driver", message="Motorista criado com sucesso"))
 
-        db.session.commit()
+        success = request.args.get("success")
+        return render_template("create-driver.html", success=success)
 
-        return {"message": "created"}, 201
-
-    @app.route("/drivers", methods=["GET"])
+    @app.route("/list-drivers", methods=["GET"])
     def list_drivers():
 
         drivers = db.session.scalars(select(Driver)).all()
+        return render_template("get-drivers.html", drivers=drivers)
 
-        dictDrivers = [driver.to_dict() for driver in drivers]
-
-        return jsonify(dictDrivers)
-
-    @app.route("/drivers/<int:id>", methods=["GET"])
-    def get_driver(id):
+    @app.route("/list-driver/<int:id>", methods=["GET"])
+    def list_driver(id):
 
         driver = db.session.get(Driver, id)
 
@@ -54,7 +51,7 @@ def init_routes(app):
 
         return jsonify(result)
 
-    @app.route("/drivers/<int:id>", methods=["PUT"])
+    @app.route("/edit-driver/<int:id>", methods=["GET", "POST"])
     def edit_driver(id):
 
         driver = db.session.get(Driver, id)
@@ -62,32 +59,28 @@ def init_routes(app):
         if not driver:
             return {"error": "Driver not found"}, 404
 
-        data = request.get_json()
+        if request.method == "POST":
 
-        driver.name = data.get("name", driver.name)
-        driver.phone = data.get("phone", driver.phone)
-        driver.vehicle = data.get("vehicle", driver.vehicle)
-        driver.active = data.get("active", driver.active)
+            driver.name = request.form.get("name")
+            driver.phone = request.form.get("phone")
+            driver.vehicle = request.form.get("vehicle")
+            driver.active = request.form.get("active")
 
-        db.session.commit()
+            db.session.commit()
 
-        result = driver.to_dict()
+            return redirect(url_for("list_drivers"))
 
-        return jsonify(result), 200
+        return render_template("edit-driver.html", driver=driver)
 
-    @app.route("/drivers/<int:id>", methods=["DELETE"])
+    @app.route("/delete-driver/<int:id>", methods=["POST"])
     def delete_driver(id):
-
         driver = db.session.get(Driver, id)
 
-        if not driver:
-            return {"error": "Driver not found"}, 404
+        if driver:
+            db.session.delete(driver)
+            db.session.commit()
 
-        db.session.delete(driver)
-
-        db.session.commit()
-
-        return {"message": "deleted"}
+        return redirect(url_for("list_drivers"))
 
     @app.route("/deliveries", methods=["POST"])
     def insert_deliveries():

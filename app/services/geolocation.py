@@ -1,5 +1,4 @@
 import requests
-import math
 
 
 def get_route(lat1, lon1, lat2, lon2):

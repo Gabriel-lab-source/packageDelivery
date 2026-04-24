@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Motorista{% endblock %}
+
+{% block content %}
+
+  <form method="POST">
+    <input type="text" name="name" value="{{ driver.name }}" required>
+    <input type="text" name="phone" value="{{ driver.phone }}" required>
+    <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
+    <button type="submit">Salvar</button>
+  </form>
+
+  <br><br>
+  <a href="/list-drivers">⬅ Voltar</a>
+
+{% endblock %}
