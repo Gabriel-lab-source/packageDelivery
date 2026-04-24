@@ -3,7 +3,7 @@ from app.models.driver import Driver
 from app.models.delivery import Delivery
 from app.services.geolocation import get_coordinates, get_route
 from sqlalchemy import select
-from flask import request, jsonify, render_template, flash, redirect, url_for
+from flask import request, jsonify, render_template, redirect, url_for
 
 
 def init_routes(app):
