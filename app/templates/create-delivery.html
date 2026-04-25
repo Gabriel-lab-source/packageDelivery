@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Entrega{% endblock %}
+
+{% block content %}
+<h1>Cadastrar nova entrega</h1>
+
+<form method="POST">
+    <input type="text" name="description" placeholder="Descrição do item" required>
+    <input type="text" name="origin_address" placeholder="Endereço de origem" required>
+    <input type="text" name="destination_address" placeholder="Endereço de destino" required>
+
+    <label>Motorista:</label>
+    <select name="driver_id" required>
+        <option value="">Selecione um motorista</option>
+        {% for driver in drivers %}
+            <option value="{{ driver.id }}">
+                {{ driver.name }} - {{ driver.vehicle }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+    <button type="submit">Cadastrar</button>
+</form>
+
+{% if request.args.get("message") %}
+    <p style="color: green;">
+        {{ request.args.get("message") }}
+    </p>
+{% endif %}
+
+{% endblock %}

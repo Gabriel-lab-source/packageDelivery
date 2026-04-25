@@ -30,26 +30,13 @@ def init_routes(app):
 
             return redirect(url_for("create_driver", message="Motorista criado com sucesso"))
 
-        success = request.args.get("success")
-        return render_template("create-driver.html", success=success)
+        return render_template("create-driver.html")
 
     @app.route("/list-drivers", methods=["GET"])
     def list_drivers():
 
         drivers = db.session.scalars(select(Driver)).all()
         return render_template("get-drivers.html", drivers=drivers)
-
-    @app.route("/list-driver/<int:id>", methods=["GET"])
-    def list_driver(id):
-
-        driver = db.session.get(Driver, id)
-
-        if not driver:
-            return {"error": "Driver not found"}, 404
-
-        result = driver.to_dict()
-
-        return jsonify(result)
 
     @app.route("/edit-driver/<int:id>", methods=["GET", "POST"])
     def edit_driver(id):
@@ -74,6 +61,7 @@ def init_routes(app):
 
     @app.route("/delete-driver/<int:id>", methods=["POST"])
     def delete_driver(id):
+
         driver = db.session.get(Driver, id)
 
         if driver:
@@ -82,34 +70,34 @@ def init_routes(app):
 
         return redirect(url_for("list_drivers"))
 
-    @app.route("/deliveries", methods=["POST"])
-    def insert_deliveries():
-        data = request.get_json()
-        print(data)
-        origin_lat, origin_lng = get_coordinates(data.get("origin_address"))
-        destination_lat, destination_lng = get_coordinates(data.get("destination_address"))
+    @app.route("/create-delivery", methods=["GET", "POST"])
+    def insert_delivery():
 
-        driver = db.session.get(Driver, data.get("driver_id"))
+        if request.method == "POST":
 
-        delivery = Delivery(
-            description=data.get("description"),
-            origin_address=data.get("origin_address"),
-            origin_lat=origin_lat,
-            origin_lng=origin_lng,
-            current_lat=origin_lat,
-            current_lng=origin_lng,
-            destination_address=data.get("destination_address"),
-            destination_lat=destination_lat,
-            destination_lng=destination_lng,
-            status=data.get("status"),
-            driver=driver
-        )
+            origin_lat, origin_lng = get_coordinates(request.form.get("origin_address"))
+            destination_lat, destination_lng = get_coordinates(request.form.get("destination_address"))
 
-        db.session.add(delivery)
+            delivery = Delivery(
+                description=request.form.get("description"),
+                origin_address=request.form.get("origin_address"),
+                origin_lat=origin_lat,
+                origin_lng=origin_lng,
+                current_lat=origin_lat,
+                current_lng=origin_lng,
+                destination_address=request.form.get("destination_address"),
+                destination_lat=destination_lat,
+                destination_lng=destination_lng,
+                driver_id=request.form.get("driver_id")
+            )
 
-        db.session.commit()
+            db.session.add(delivery)
+            db.session.commit()
 
-        return {"message": "created"}, 201
+            return redirect(url_for("insert_delivery", message="Entrega criada com sucesso"))
+
+        drivers = db.session.scalars(select(Driver)).all()
+        return render_template("create-delivery.html", drivers=drivers)
 
     @app.route("/deliveries", methods=["GET"])
     def list_deliveries():
