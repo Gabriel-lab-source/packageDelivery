@@ -1,15 +1,41 @@
 from app import db
 from app.models.driver import Driver
 from app.models.delivery import Delivery
+from app.models.user import User
 from app.services.geolocation import get_coordinates, get_route
 from sqlalchemy import select
-from flask import request, jsonify, render_template, redirect, url_for
+from flask import request, jsonify, render_template, redirect, url_for, session
 
 
 def init_routes(app):
     @app.route("/")
     def home():
-        return "Hello"
+        return render_template("home.html")
+
+    @app.route("/login")
+    def login():
+        return render_template("login.html")
+
+    @app.route("/register", methods=["GET", "POST"])
+    def register():
+        if request.method == "POST":
+
+            role = request.form.get("role")
+
+            new_user = User(
+                name=request.form.get("name"),
+                email=request.form.get("email"),
+                password=request.form.get("password"),
+                role=role
+            )
+
+            db.session.add(new_user)
+            db.session.commit()
+            session["user_id"] = new_user.id
+
+            if role == "driver":
+                return redirect("/create-driver")
+        return render_template("register.html")
 
     @app.route("/health")
     def health():
@@ -17,9 +43,13 @@ def init_routes(app):
 
     @app.route("/create-driver", methods=["GET", "POST"])
     def create_driver():
+        user = db.session.get(User, session["user_id"])
+        print(user.name)
 
         if request.method == "POST":
+            user_id = session["user_id"]
             new_driver = Driver(
+                user_id=user_id,
                 name=request.form.get("name"),
                 phone=request.form.get("phone"),
                 vehicle=request.form.get("vehicle")
@@ -28,9 +58,9 @@ def init_routes(app):
             db.session.add(new_driver)
             db.session.commit()
 
-            return redirect(url_for("create_driver", message="Motorista criado com sucesso"))
+            return redirect("/", message="Motorista criado com sucesso")
 
-        return render_template("create-driver.html")
+        return render_template("create-driver.html", user=user)
 
     @app.route("/list-drivers", methods=["GET"])
     def list_drivers():

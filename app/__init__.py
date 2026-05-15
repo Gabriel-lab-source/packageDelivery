@@ -7,6 +7,7 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
 
+    app.config["SECRET_KEY"] = "minha-chave-secreta"
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///delivery.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # Desativa sistema que monitora objetos do banco
 

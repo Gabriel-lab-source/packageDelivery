@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bem vindo</title>
+</head>
+<body>
+  <h1>Bem-vindo ao sistema de entregas</h1>
+  <p>
+    <a href="/login">Entrar</a> |
+    <a href="/register">Cadastrar</a>
+  </p>
+
+{% if request.args.get("message") %}
+    <p style="color: green;">
+        {{ request.args.get("message") }}
+    </p>
+{% endif %}
+</body>
+</html>

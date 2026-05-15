@@ -6,7 +6,7 @@
     <h1>Cadastrar novo motorista</h1>
 
     <form method="POST">
-        <input type="text" name="name" placeholder="Nome" required>
+        <input type="text" name="name" value="{{ user.name }}" readonly>
         <input type="text" name="phone" placeholder="Telefone" required>
         <input type="text" name="vehicle" placeholder="Veículo" required>
         <button type="submit">Cadastrar</button>
@@ -14,11 +14,5 @@
 
     <br><br>
     <a href="/list-drivers">Ver lista de motoristas</a>
-
-    {% if request.args.get("message") %}
-        <p style="color: green;">
-            {{ request.args.get("message") }}
-        </p>
-    {% endif %}
 
 {% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cadastro</title>
+</head>
+<body>
+
+  <h1>Cadastro</h1>
+
+  <form method="POST">
+
+    <p>
+      <label>Nome:</label><br>
+      <input type="text" name="name" required>
+    </p>
+
+    <p>
+      <label>Email:</label><br>
+      <input type="email" name="email" required>
+    </p>
+
+    <p>
+      <label>Senha:</label><br>
+      <input type="password" name="password" required>
+    </p>
+
+    <p>
+      <label>Escolha sua função:</label>
+        <select name="role" required>
+          <option value="">Selecione</option>
+          <option value="driver">Motorista</option>
+          <option value="customer">Cliente</option>
+        </select>
+    </p>
+
+
+    <button type="submit">Cadastrar</button>
+
+  </form>
+
+  <p>
+    Já possui conta?
+    <a href="/login">Entrar</a>
+  </p>
+
+</body>
+</html>
