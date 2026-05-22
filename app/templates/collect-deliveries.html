@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Mercadorias disponíveis para entrega</title>
+</head>
+
+<body>
+
+    <h1>Mercadorias disponíveis para entrega:</h1>
+
+    <form action="/collect-packages" method="POST">
+
+        {% for package in packages %}
+
+            <div>
+
+                <input 
+                    type="checkbox"
+                    name="package_ids"
+                    value="{{ package.id }}"
+                >
+
+                <strong>Mercadoria:</strong>
+                {{ package.description }}
+
+                <br>
+
+                <strong>Destinatário:</strong>
+                {{ package.recipient }}
+
+                <br>
+
+                <strong>Endereço:</strong>
+                {{ package.address }}
+
+                <br><br>
+
+            </div>
+
+        {% endfor %}
+
+        <button type="submit">
+            Coletar mercadorias selecionadas
+        </button>
+
+    </form>
+
+    {% if session.get("user_id") %}
+        <a href="{{ url_for('auth.logout') }}">
+            <button>Sair</button>
+        </a>
+    {% endif %}
+
+</body>
+</html>

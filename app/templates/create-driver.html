@@ -1,8 +1,11 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de novo motorista</title>
+</head>
+<body>
 
-{% block title %}Cadastrar Motorista{% endblock %}
-
-{% block content %}
     <h1>Cadastrar novo motorista</h1>
 
     <form method="POST">
@@ -13,6 +16,12 @@
     </form>
 
     <br><br>
-    <a href="/list-drivers">Ver lista de motoristas</a>
 
-{% endblock %}
+    {% if session.get("user_id") %}
+        <a href="{{ url_for('auth.logout') }}">
+            <button>Sair da sessão</button>
+        </a>
+    {% endif %}
+
+</body>
+</html>

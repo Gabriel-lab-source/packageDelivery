@@ -1,17 +1,24 @@
-{% extends "base.html" %}
-
-{% block title %}Editar Motorista{% endblock %}
-
-{% block content %}
-
-  <form method="POST">
-    <input type="text" name="name" value="{{ driver.name }}" required>
-    <input type="text" name="phone" value="{{ driver.phone }}" required>
-    <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
-    <button type="submit">Salvar</button>
-  </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+    {% if session.get("user_id") %}
+        <a href="{{ url_for('auth.logout') }}">
+            <button>Sair</button>
+        </a>
+    {% endif %}
+    <form method="POST">
+      <input type="text" name="name" value="{{ driver.name }}" required>
+      <input type="text" name="phone" value="{{ driver.phone }}" required>
+      <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
+      <button type="submit">Salvar</button>
+    </form>
 
   <br><br>
-  <a href="/list-drivers">⬅ Voltar</a>
 
-{% endblock %}
+</body>
+</html>
+

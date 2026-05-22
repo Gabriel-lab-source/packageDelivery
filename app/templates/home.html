@@ -5,15 +5,36 @@
 </head>
 <body>
   <h1>Bem-vindo ao sistema de entregas</h1>
-  <p>
-    <a href="/login">Entrar</a> |
-    <a href="/register">Cadastrar</a>
-  </p>
+  <nav>
 
-{% if request.args.get("message") %}
-    <p style="color: green;">
-        {{ request.args.get("message") }}
-    </p>
-{% endif %}
+  {% if not session.get("user_id") %}
+
+      <a href="/auth/login">Entrar</a>
+      <a href="/auth/register">Cadastrar</a>
+
+  {% elif session.get("role") == "customer" %}
+
+    <a href="/customer/create-delivery">Criar entrega</a>
+    <a href="/customer/my-deliveries">Minhas entregas</a>
+    <a href="/auth/logout">Sair da sessão</a>
+
+  {% elif session.get("role") == "driver" %}
+
+      <a href="/driver/collect-delivery">Coletar entregas</a>
+      <a href="/driver/driver-deliveries">Entregas coletadas</a>
+      <a href="/auth/logout">Sair da sessão</a>
+
+  {% endif %}
+
+</nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 </body>
 </html>

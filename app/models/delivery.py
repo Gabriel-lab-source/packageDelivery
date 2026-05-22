@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 from datetime import datetime, timezone
 
 
@@ -8,6 +8,7 @@ class Delivery(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(150), nullable=False)
+    recipient = db.Column(db.String(150), nullable=False)
     origin_address = db.Column(db.String(150), nullable=False)
     origin_lat = db.Column(db.Float)
     origin_lng = db.Column(db.Float)
@@ -25,6 +26,7 @@ class Delivery(db.Model):
         return {
             "id": self.id,
             "description": self.description,
+            "recipient": self.recipient,
             "origin_address": self.origin_address,
             "origin_lat": self.origin_lat,
             "origin_lng": self.origin_lng,
