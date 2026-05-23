@@ -33,31 +33,41 @@ def create_driver():
         db.session.add(new_driver)
         db.session.commit()
 
-        return redirect("/customer/collect-deliveries")
+        return redirect("/driver/collect-deliveries")
 
-    return render_template("driver/create-driver.html", user=user)
+    return render_template("create-driver.html", user=user)
 
 
 @driver_bp.route("/collect-deliveries", methods=["POST", "GET"])
 def collect_deliveries():
 
     if "user_id" not in session or session["role"] != "driver":
-        return redirect("/login")
+        return redirect("/auth/login")
 
-    packages = Delivery.query.filter_by(status="pending", driver_id=None).all()
+    packages = Delivery.query.filter_by(
+        status="pending",
+        driver_id=None
+        ).all()
 
     if request.method == "POST":
 
         selected_packages = request.form.getlist("package_ids")
 
+        driver = Driver.query.filter_by(
+            user_id=session["user_id"]
+            ).first()
+
         for package_id in selected_packages:
 
             delivery = db.session.get(Delivery, package_id)
-            driver = Driver.query.filter_by(user_id=session["user_id"]).first()
-            delivery.driver_id = driver.id
+
+            if delivery:
+                delivery.driver_id = driver.id
+                delivery.status = "collected"
+
             db.session.commit()
 
-        return redirect("/deliveries")
+        return redirect(url_for("driver.get_driver_deliveries"))
     return render_template("collect-deliveries.html", packages=packages)
 
 

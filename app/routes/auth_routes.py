@@ -48,6 +48,7 @@ def register():
 
         flash("Conta criada com sucesso!", "success")
         return redirect(url_for("main.home"))
+
     return render_template("register.html")
 
 

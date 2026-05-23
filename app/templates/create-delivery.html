@@ -13,7 +13,8 @@
 <form method="POST">
 
     <input type="text" name="description" placeholder="Descrição do item" required>
-    <input type="text" name="name" placeholder="Destinatário" required>
+    <input type="text" name="sender" value="{{ user.name }}" readonly>
+    <input type="text" name="recipient" placeholder="Destinatário" required>
     <input type="text" name="origin_address" placeholder="Endereço de origem" required>
     <input type="text" name="destination_address" placeholder="Endereço de destino" required>
 

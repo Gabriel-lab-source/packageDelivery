@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Entregas do motorista</title>
+</head>
+<body>
+  <h1>Entregas do motorista</h1>
+
+  <h2>Entregas em progresso:</h2>
+
+  {% for delivery in deliveries %}
+
+    {% if delivery.status == "in_progress" %}
+
+      <div style="border:1px solid black; margin:10px; padding:10px;">
+
+        <p>ID: {{ delivery.id }}</p>
+
+        <p>Remetente: {{ delivery.sender }}</p>
+
+        <p>Destinatário: {{ delivery.recipient }}</p>
+
+        <p>Status: {{ delivery.status }}</p>
+
+        <p>Endereço de origem: {{ delivery.origin_address }}</p>
+
+        <p>Endereço de destino: {{ delivery.destination_address }}</p>
+
+        <form method="POST" action="/finish-delivery/{{ delivery.id }}">
+          <button type="submit">
+            Finalizar entrega
+          </button>
+        </form>
+
+      </div>
+
+    {% endif %}
+
+  {% endfor %}
+
+
+  <h2>Entregas finalizadas</h2>
+
+  {% for delivery in deliveries %}
+
+    {% if delivery.status == "delivered" %}
+
+      <div style="border:1px solid gray; margin:10px; padding:10px;">
+
+        <p>ID: {{ delivery.id }}</p>
+
+        <p>Remetente: {{ delivery.sender }}</p>
+
+        <p>Destinatário: {{ delivery.recipient }}</p>
+
+        <p>Status: {{ delivery.status }}</p>
+
+        <p>Endereço de origem: {{ delivery.origin_address }}</p>
+
+        <p>Endereço de destino: {{ delivery.destination_address }}</p>
+
+      </div>
+
+    {% endif %}
+
+  {% endfor %}
+</body>
+</html>

@@ -15,9 +15,10 @@ customer_bp = Blueprint(
 @customer_bp.route("/create-delivery", methods=["GET", "POST"])
 def insert_delivery():
 
+    if "user_id" not in session or session["role"] != "Cliente":
+        return redirect("/auth/login")
+
     user = db.session.get(User, session["user_id"])
-    if "user_id" not in session and user.role != "Cliente":
-        return redirect("/login")
 
     if request.method == "POST":
 
@@ -26,7 +27,8 @@ def insert_delivery():
 
         delivery = Delivery(
             description=request.form.get("description"),
-            recipient=request.form.get("name"),
+            sender=request.form.get("sender"),
+            recipient=request.form.get("recipient"),
             origin_address=request.form.get("origin_address"),
             origin_lat=origin_lat,
             origin_lng=origin_lng,
@@ -40,9 +42,9 @@ def insert_delivery():
         db.session.add(delivery)
         db.session.commit()
 
-        return redirect(url_for("customer/insert_delivery", message="Entrega criada com sucesso"))
+        return redirect(url_for("customer.insert_delivery", message="Entrega criada com sucesso"))
 
-    return render_template("create-delivery.html")
+    return render_template("create-delivery.html", user=user)
 
 
 @customer_bp.route("/deliveries", methods=["GET"])

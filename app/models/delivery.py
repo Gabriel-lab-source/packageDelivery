@@ -8,6 +8,7 @@ class Delivery(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(150), nullable=False)
+    sender = db.Column(db.String(150), nullable=False)
     recipient = db.Column(db.String(150), nullable=False)
     origin_address = db.Column(db.String(150), nullable=False)
     origin_lat = db.Column(db.Float)
@@ -26,6 +27,7 @@ class Delivery(db.Model):
         return {
             "id": self.id,
             "description": self.description,
+            "sender": self.sender,
             "recipient": self.recipient,
             "origin_address": self.origin_address,
             "origin_lat": self.origin_lat,
