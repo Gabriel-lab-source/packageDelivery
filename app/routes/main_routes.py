@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, session
+from flask import render_template, Blueprint
 
 main_bp = Blueprint(
     "main",

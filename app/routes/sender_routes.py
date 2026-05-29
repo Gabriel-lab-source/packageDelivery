@@ -1,7 +1,7 @@
 from app.extensions import db
 from app.models.delivery import Delivery
 from app.models.user import User
-from app.services.geolocation import get_coordinates
+from app.services.geolocation import get_coordinates, get_route
 from sqlalchemy import select
 from flask import request, jsonify, render_template, redirect, url_for, Blueprint, session
 
@@ -24,6 +24,13 @@ def insert_delivery():
         origin_lat, origin_lng = get_coordinates(request.form.get("origin_address"))
         destination_lat, destination_lng = get_coordinates(request.form.get("destination_address"))
 
+        route = get_route(
+            origin_lat,
+            origin_lng,
+            destination_lat,
+            destination_lng
+        )
+
         delivery = Delivery(
             description=request.form.get("description"),
             sender=request.form.get("sender"),
@@ -36,6 +43,8 @@ def insert_delivery():
             destination_address=request.form.get("destination_address"),
             destination_lat=destination_lat,
             destination_lng=destination_lng,
+            route_distance=route["distance"],
+            route_duration=route["duration"]
         )
 
         db.session.add(delivery)

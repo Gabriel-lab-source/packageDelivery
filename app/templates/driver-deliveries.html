@@ -27,7 +27,15 @@
 
         <p>Endereço de destino: {{ delivery.destination_address }}</p>
 
-        <form method="POST" action="/finish-delivery/{{ delivery.id }}">
+        <form method="POST">
+            <a href="/driver-deliveries/{{ delivery.id }}/real-eta">
+              <button>
+                Ver distância e tempo estimado de entrega
+              </button>
+            </a>
+        </form>
+
+        <form method="POST">
           <button type="submit">
             Finalizar entrega
           </button>
@@ -65,5 +73,11 @@
     {% endif %}
 
   {% endfor %}
+
+  <p>
+      <a href="{{ url_for('main.home') }}">
+          <button>Voltar</button>
+      </a>
+  </p>
 </body>
 </html>

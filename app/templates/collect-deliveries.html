@@ -46,6 +46,12 @@
 
     </form>
 
+    <p>
+        <a href="{{ url_for('main.home') }}">
+            <button>Voltar</button>
+        </a>
+    </p>
+
     {% if session.get("user_id") %}
         <a href="{{ url_for('auth.logout') }}">
             <button>Sair</button>
