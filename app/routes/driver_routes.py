@@ -4,13 +4,11 @@ from app.models.delivery import Delivery
 from app.models.user import User
 from app.services.geolocation import get_route
 from sqlalchemy import select
-from flask import request, jsonify, render_template, redirect, url_for, session, Blueprint
+from flask import request, render_template, redirect, url_for, session, Blueprint
 
 driver_bp = Blueprint(
     "driver",
-    __name__,
-    url_prefix="/driver"
-
+    __name__
 )
 
 
@@ -33,7 +31,7 @@ def create_driver():
         db.session.add(new_driver)
         db.session.commit()
 
-        return redirect("/driver/collect-deliveries")
+        return redirect("/collect-deliveries")
 
     return render_template("create-driver.html", user=user)
 
@@ -42,7 +40,7 @@ def create_driver():
 def collect_deliveries():
 
     if "user_id" not in session or session["role"] != "driver":
-        return redirect("/auth/login")
+        return redirect("/login")
 
     packages = Delivery.query.filter_by(
         status="pending",
@@ -63,11 +61,11 @@ def collect_deliveries():
 
             if delivery:
                 delivery.driver_id = driver.id
-                delivery.status = "collected"
+                delivery.status = "in_progress"
 
             db.session.commit()
 
-        return redirect(url_for("driver.get_driver_deliveries"))
+        return redirect(url_for("driver.driver_deliveries"))
     return render_template("collect-deliveries.html", packages=packages)
 
 
@@ -116,17 +114,17 @@ def delete_driver(id):
     return redirect(url_for("list_drivers"))
 
 
-@driver_bp.route("/drivers/<int:id>/deliveries", methods=["GET"])
-def get_driver_deliveries(id):
+@driver_bp.route("/driver-deliveries", methods=["GET"])
+def driver_deliveries():
 
-    driver = db.session.get(Driver, id)
+    driver = Driver.query.filter_by(user_id=session["user_id"]).first()
 
     if not driver:
         return {"error": "Driver not found"}, 404
 
-    deliveries = [deliveries.to_dict() for deliveries in driver.deliveries]
+    deliveries = driver.deliveries
 
-    return jsonify(deliveries)
+    return render_template("driver-deliveries.html", deliveries=deliveries)
 
 
 @driver_bp.route("/deliveries/<int:id>/real-eta", methods=["GET"])

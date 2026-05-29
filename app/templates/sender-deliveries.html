@@ -1,13 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <title>Entregas do motorista</title>
+  <title>Pedidos de entrega cadastrados</title>
 </head>
-<body>
-  <h1>Entregas do motorista</h1>
 
-  <h2>Entregas em andamento:</h2>
+<body>
+
+  <h1>Entregas do remetente</h1>
+
+    <h2>Entregas a caminho do destinatário</h2>
+
+    {% for delivery in deliveries %}
+
+      {% if delivery.status == "pending" %}
+
+        <div style="border:1px solid black; margin:10px; padding:10px;">
+
+          <p>ID: {{ delivery.id }}</p>
+
+          <p>Remetente: {{ delivery.sender }}</p>
+
+          <p>Destinatário: {{ delivery.recipient }}</p>
+
+          <p>Status: {{ delivery.status }}</p>
+
+          <p>Endereço de origem: {{ delivery.origin_address }}</p>
+
+          <p>Endereço de destino: {{ delivery.destination_address }}</p>
+
+        </div>
+
+      {% endif %}
+
+    {% endfor %}
+
+  <h2>Entregas a caminho do destinatário</h2>
 
   {% for delivery in deliveries %}
 
@@ -27,20 +56,13 @@
 
         <p>Endereço de destino: {{ delivery.destination_address }}</p>
 
-        <form method="POST" action="/finish-delivery/{{ delivery.id }}">
-          <button type="submit">
-            Finalizar entrega
-          </button>
-        </form>
-
       </div>
 
     {% endif %}
 
   {% endfor %}
 
-
-  <h2>Entregas finalizadas:</h2>
+  <h2>Entregas finalizadas</h2>
 
   {% for delivery in deliveries %}
 
@@ -65,5 +87,13 @@
     {% endif %}
 
   {% endfor %}
+
+<p>
+    <a href="{{ url_for('main.home') }}">
+        <button>Voltar</button>
+    </a>
+</p>
+
 </body>
+
 </html>

@@ -9,20 +9,20 @@
 
   {% if not session.get("user_id") %}
 
-      <a href="/auth/login">Entrar</a>
-      <a href="/auth/register">Cadastrar</a>
+      <a href="/login">Entrar</a>
+      <a href="/register">Cadastrar</a>
 
-  {% elif session.get("role") == "customer" %}
+  {% elif session.get("role") == "sender" %}
 
-    <a href="/customer/create-delivery">Criar entrega</a>
-    <a href="/customer/my-deliveries">Minhas entregas</a>
-    <a href="/auth/logout">Sair da sessão</a>
+    <a href="/create-delivery">Criar entrega</a>
+    <a href="/sender-deliveries">Minhas entregas</a>
+    <a href="/logout">Sair da sessão</a>
 
   {% elif session.get("role") == "driver" %}
 
-      <a href="/driver/collect-delivery">Coletar entregas</a>
-      <a href="/driver/driver-deliveries">Entregas coletadas</a>
-      <a href="/auth/logout">Sair da sessão</a>
+      <a href="/collect-deliveries">Coletar entregas</a>
+      <a href="/driver-deliveries">Minhas entregas</a>
+      <a href="/logout">Sair da sessão</a>
 
   {% endif %}
 

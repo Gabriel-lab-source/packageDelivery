@@ -4,8 +4,7 @@ from flask import request, render_template, redirect, session, Blueprint, url_fo
 
 auth_bp = Blueprint(
     "auth",
-    __name__,
-    url_prefix="/auth"
+    __name__
 )
 
 
@@ -44,7 +43,7 @@ def register():
         session["role"] = new_user.role
 
         if role == "driver":
-            return redirect("/driver/create-driver")
+            return redirect("/create-driver")
 
         flash("Conta criada com sucesso!", "success")
         return redirect(url_for("main.home"))

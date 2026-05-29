@@ -5,18 +5,17 @@ from app.services.geolocation import get_coordinates
 from sqlalchemy import select
 from flask import request, jsonify, render_template, redirect, url_for, Blueprint, session
 
-customer_bp = Blueprint(
-    "customer",
-    __name__,
-    url_prefix="/customer"
+sender_bp = Blueprint(
+    "sender",
+    __name__
 )
 
 
-@customer_bp.route("/create-delivery", methods=["GET", "POST"])
+@sender_bp.route("/create-delivery", methods=["GET", "POST"])
 def insert_delivery():
 
-    if "user_id" not in session or session["role"] != "Cliente":
-        return redirect("/auth/login")
+    if "user_id" not in session or session["role"] != "sender":
+        return redirect("/login")
 
     user = db.session.get(User, session["user_id"])
 
@@ -42,12 +41,12 @@ def insert_delivery():
         db.session.add(delivery)
         db.session.commit()
 
-        return redirect(url_for("customer.insert_delivery", message="Entrega criada com sucesso"))
+        return redirect(url_for("sender.insert_delivery", message="Entrega criada com sucesso"))
 
     return render_template("create-delivery.html", user=user)
 
 
-@customer_bp.route("/deliveries", methods=["GET"])
+@sender_bp.route("/deliveries", methods=["GET"])
 def list_deliveries():
 
     deliveries = db.session.scalars(select(Delivery)).all()
@@ -55,7 +54,7 @@ def list_deliveries():
     return jsonify(dict_deliveries)
 
 
-@customer_bp.route("/deliveries/<int:id>", methods=["GET"])
+@sender_bp.route("/deliveries/<int:id>", methods=["GET"])
 def get_deliveries(id):
 
     deliveries = db.session.get(Delivery, id)
@@ -67,7 +66,7 @@ def get_deliveries(id):
     return jsonify(result)
 
 
-@customer_bp.route("/deliveries/<int:id>", methods=["PUT"])
+@sender_bp.route("/deliveries/<int:id>", methods=["PUT"])
 def edit_deliveries(id):
 
     delivery = db.session.get(Delivery, id)
@@ -97,7 +96,7 @@ def edit_deliveries(id):
     return jsonify(delivery.to_dict())
 
 
-@customer_bp.route("/deliveries/<int:id>", methods=["DELETE"])
+@sender_bp.route("/deliveries/<int:id>", methods=["DELETE"])
 def delete_deliveries(id):
 
     deliveries = db.session.get(Delivery, id)
@@ -110,3 +109,19 @@ def delete_deliveries(id):
     db.session.commit()
 
     return {"message": "deleted"}
+
+
+@sender_bp.route("/sender-deliveries", methods=["GET"])
+def sender_deliveries():
+
+    user = db.session.get(User, session["user_id"])
+
+    if not user:
+        return {"error": "user not found"}, 404
+
+    deliveries = Delivery.query.filter_by(sender=user.name).all()
+
+    if not deliveries:
+        return {"error": "deliveries not found"}, 404
+
+    return render_template("sender-deliveries.html", deliveries=deliveries)

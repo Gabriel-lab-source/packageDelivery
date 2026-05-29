@@ -13,12 +13,12 @@ def create_app():
 
     from app.routes.driver_routes import driver_bp
     from app.routes.auth_routes import auth_bp
-    from app.routes.customer_routes import customer_bp
+    from app.routes.sender_routes import sender_bp
     from app.routes.main_routes import main_bp
 
     app.register_blueprint(driver_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(customer_bp)
+    app.register_blueprint(sender_bp)
     app.register_blueprint(main_bp)
 
     with app.app_context():
