@@ -129,6 +129,7 @@ def driver_deliveries():
 
 @driver_bp.route("/driver-deliveries/<int:id>/real-eta", methods=["GET"])
 def get_real_eta(id):
+
     delivery = db.session.get(Delivery, id)
 
     if not delivery:
@@ -137,17 +138,17 @@ def get_real_eta(id):
     if not delivery.current_lat:
         return {"error": "Current location not available"}, 400
 
-    distance, duration = get_route(
+    route = get_route(
         delivery.current_lat,
         delivery.current_lng,
         delivery.destination_lat,
         delivery.destination_lng
     )
 
-    if not distance:
+    if not route:
         return {"error": "Could not calculate route"}, 400
 
-    return render_template("real-eta.html", distance=distance, duration=duration)
+    return render_template("driver-deliveries-real-eta.html", route=route, delivery=delivery)
 
 
 @driver_bp.route("/deliveries/<int:id>/location", methods=["PUT"])

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Informações da entrega:</title>
+  <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <h1>Informações da entrega</h1>
+
+  <p>Distância: {{ route["distance"] }} km</p>
+
+  <p>Tempo estimado: {{ route["duration"] }} minutos</p>
+
+  <div id="map" style="height: 500px;"></div>
+
+    <p>
+        <a href="{{ url_for('main.home') }}">
+            <button>Voltar</button>
+        </a>
+    </p>
+
+    {% if session.get("user_id") %}
+        <a href="{{ url_for('auth.logout') }}">
+            <button>Sair</button>
+        </a>
+    {% endif %}
+
+<script>
+
+    const map = L.map('map').setView(
+        [-22.90, -47.06],
+        13
+    );
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+    const origin = [
+      {{ delivery.origin_lat }},
+      {{ delivery.origin_lng }}
+    ];
+
+    const destination = [
+      {{ delivery.destination_lat }},
+      {{ delivery.destination_lng }}
+    ];
+
+    L.marker(origin)
+      .addTo(map)
+      .bindPopup("Origem");
+
+    L.marker(destination)
+      .addTo(map)
+      .bindPopup("Destino");
+
+    const routeData = {{ route.geometry | tojson }};
+    const coordinates = routeData.coordinates.map(coord => [
+      coord[1],
+      coord[0]
+    ]);
+
+    const polyline = L.polyline(
+      coordinates,
+      {
+          weight: 5
+      }
+    ).addTo(map);
+    
+    const bounds = L.latLngBounds([
+      origin,
+      destination
+    ]);
+
+    map.fitBounds(polyline.getBounds());
+
+</script>
+
+</body>
+
+</html>
