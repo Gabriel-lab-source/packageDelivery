@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Minhas entregas | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Entregas do remetente</h1>
+    <p class="lead">Acompanhe o status das entregas cadastradas por você.</p>
+
+    {% if not deliveries %}
+      <div class="empty-state">
+        <strong>Nenhuma entrega cadastrada ainda.</strong>
+        <p>Quando você criar uma entrega, ela aparecerá aqui com o status atualizado.</p>
+        <a class="button" href="{{ url_for('sender.insert_delivery') }}">Criar primeira entrega</a>
+      </div>
+    {% else %}
+      <h2>Aguardando coleta</h2>
+      {% if pending_deliveries %}
+        <div class="list-grid">
+          {% for delivery in pending_deliveries %}
+            <article class="delivery-card">
+              <div class="card-title">
+                <span>Entrega #{{ delivery.id }}</span>
+                <span class="badge warning">Pendente</span>
+              </div>
+              <div class="details">
+                <p><strong>Remetente:</strong> {{ delivery.sender }}</p>
+                <p><strong>Destinatário:</strong> {{ delivery.recipient }}</p>
+                <p><strong>Origem:</strong> {{ delivery.origin_address }}</p>
+                <p><strong>Destino:</strong> {{ delivery.destination_address }}</p>
+                {% if delivery.route_distance and delivery.route_duration %}
+                  <p><strong>Distância:</strong> {{ delivery.route_distance }} km</p>
+                  <p><strong>Tempo estimado:</strong> {{ delivery.route_duration }} minutos</p>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state compact">Não há entregas aguardando coleta.</div>
+      {% endif %}
+
+      <h2>A caminho do destinatário</h2>
+      {% if in_progress_deliveries %}
+        <div class="list-grid">
+          {% for delivery in in_progress_deliveries %}
+            <article class="delivery-card">
+              <div class="card-title">
+                <span>Entrega #{{ delivery.id }}</span>
+                <span class="badge">Em rota</span>
+              </div>
+              <div class="details">
+                <p><strong>Remetente:</strong> {{ delivery.sender }}</p>
+                <p><strong>Destinatário:</strong> {{ delivery.recipient }}</p>
+                <p><strong>Origem:</strong> {{ delivery.origin_address }}</p>
+                <p><strong>Destino:</strong> {{ delivery.destination_address }}</p>
+                {% if delivery.route_distance and delivery.route_duration %}
+                  <p><strong>Distância restante:</strong> {{ delivery.route_distance }} km</p>
+                  <p><strong>Tempo estimado:</strong> {{ delivery.route_duration }} minutos</p>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state compact">Não há entregas em rota no momento.</div>
+      {% endif %}
+
+      <h2>Entregas finalizadas</h2>
+      {% if delivered_deliveries %}
+        <div class="list-grid">
+          {% for delivery in delivered_deliveries %}
+            <article class="delivery-card delivered">
+              <div class="card-title">
+                <span>Entrega #{{ delivery.id }}</span>
+                <span class="badge done">Entregue</span>
+              </div>
+              <div class="details">
+                <p><strong>Remetente:</strong> {{ delivery.sender }}</p>
+                <p><strong>Destinatário:</strong> {{ delivery.recipient }}</p>
+                <p><strong>Origem:</strong> {{ delivery.origin_address }}</p>
+                <p><strong>Destino:</strong> {{ delivery.destination_address }}</p>
+                {% if delivery.route_distance and delivery.route_duration %}
+                  <p><strong>Distância final:</strong> {{ delivery.route_distance }} km</p>
+                  <p><strong>Tempo estimado:</strong> {{ delivery.route_duration }} minutos</p>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state compact">Não há entregas finalizadas ainda.</div>
+      {% endif %}
+    {% endif %}
+
+    <div class="footer-actions">
+      <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+    </div>
+  </section>
+{% endblock %}

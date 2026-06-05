@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Sistema de Entregas{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="{{ url_for('main.home') }}">
+      <strong>Entrega Fácil</strong>
+      <span>Gestão de coletas e entregas</span>
+    </a>
+
+    <nav class="app-nav" aria-label="Navegação principal">
+      {% if not session.get("user_id") %}
+        <a href="{{ url_for('auth.login') }}">Entrar</a>
+        <a href="{{ url_for('auth.register') }}">Cadastrar</a>
+      {% elif session.get("role") == "sender" %}
+        <a href="{{ url_for('sender.insert_delivery') }}">Criar entrega</a>
+        <a href="{{ url_for('sender.sender_deliveries') }}">Minhas entregas</a>
+        <a href="{{ url_for('auth.logout') }}">Sair</a>
+      {% elif session.get("role") == "driver" %}
+        <a href="{{ url_for('driver.collect_deliveries') }}">Coletar entregas</a>
+        <a href="{{ url_for('driver.driver_deliveries') }}">Minhas entregas</a>
+        <a href="{{ url_for('auth.logout') }}">Sair</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

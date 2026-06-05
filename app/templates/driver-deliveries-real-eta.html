@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Rota da entrega | Entrega Fácil{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Informações da entrega</h1>
+    <p class="lead">Resumo da distância, tempo estimado e rota até o destino.</p>
+
+    <div class="list-grid">
+      <article class="delivery-card">
+        <div class="card-title">Distância</div>
+        <p class="lead">{{ route["distance"] }} km</p>
+      </article>
+
+      <article class="delivery-card">
+        <div class="card-title">Tempo estimado</div>
+        <p class="lead">{{ route["duration"] }} minutos</p>
+      </article>
+    </div>
+
+    <h2>Mapa da rota</h2>
+    <div id="map" class="map"></div>
+    <div id="location-status" class="route-status"></div>
+
+    <div class="footer-actions">
+      <button type="button" id="update-location">Atualizar minha localização</button>
+      <a class="button secondary" href="{{ url_for('driver.driver_deliveries') }}">Voltar</a>
+    </div>
+  </section>
+
+  <script>
+    const map = L.map('map').setView([-22.90, -47.06], 13);
+
+    L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution: '&copy; OpenStreetMap contributors'
+      }
+    ).addTo(map);
+
+    const currentLocation = [
+      {{ delivery.current_lat }},
+      {{ delivery.current_lng }}
+    ];
+
+    const destination = [
+      {{ delivery.destination_lat }},
+      {{ delivery.destination_lng }}
+    ];
+
+    L.marker(currentLocation)
+      .addTo(map)
+      .bindPopup("Localização atual");
+
+    L.marker(destination)
+      .addTo(map)
+      .bindPopup("Destino");
+
+    const routeData = {{ route.geometry | tojson }};
+    const coordinates = routeData.coordinates.map(coord => [
+      coord[1],
+      coord[0]
+    ]);
+
+    const polyline = L.polyline(
+      coordinates,
+      {
+        weight: 5
+      }
+    ).addTo(map);
+
+    map.fitBounds(polyline.getBounds());
+
+    const updateButton = document.querySelector('#update-location');
+    const locationStatus = document.querySelector('#location-status');
+
+    updateButton.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = 'Seu navegador não permite obter localização.';
+        locationStatus.className = 'route-status error';
+        return;
+      }
+
+      locationStatus.textContent = 'Atualizando localização...';
+      locationStatus.className = 'route-status';
+
+      navigator.geolocation.getCurrentPosition(
+        async position => {
+          const response = await fetch(
+            "{{ url_for('driver.update_delivery_location', id=delivery.id) }}",
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              })
+            }
+          );
+
+          if (!response.ok) {
+            locationStatus.textContent = 'Não foi possível atualizar a rota.';
+            locationStatus.className = 'route-status error';
+            return;
+          }
+
+          window.location.reload();
+        },
+        () => {
+          locationStatus.textContent = 'Não foi possível acessar sua localização.';
+          locationStatus.className = 'route-status error';
+        }
+      );
+    });
+  </script>
+{% endblock %}

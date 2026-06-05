@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar entrega | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Cadastrar nova entrega</h1>
+    <p class="lead">Preencha os dados da mercadoria, origem e destino para criar uma nova solicitação.</p>
+
+    {% if request.args.get("message") %}
+      <div class="alert success-message">{{ request.args.get("message") }}</div>
+    {% endif %}
+
+    <form class="form-grid" method="POST">
+      <label class="full">
+        Descrição do item
+        <input type="text" name="description" placeholder="Ex: caixa pequena, documento, produto frágil" required>
+      </label>
+
+      <label>
+        Remetente
+        <input type="text" name="sender" value="{{ user.name }}" readonly>
+      </label>
+
+      <label>
+        Destinatário
+        <input type="text" name="recipient" placeholder="Nome do destinatário" required>
+      </label>
+
+      <label>
+        Endereço de origem
+        <input type="text" name="origin_address" placeholder="Rua, número, bairro e cidade" required>
+      </label>
+
+      <label>
+        Endereço de destino
+        <input type="text" name="destination_address" placeholder="Rua, número, bairro e cidade" required>
+      </label>
+
+      <div class="footer-actions full">
+        <button type="submit">Cadastrar entrega</button>
+        <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="auth-card">
+    <h1>Cadastro</h1>
+
+    <form method="POST">
+      <label>
+        Nome
+        <input type="text" name="name" required>
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" required>
+      </label>
+
+      <label>
+        Senha
+        <input type="password" name="password" required>
+      </label>
+
+      <label>
+        Escolha sua função
+        <select name="role" required>
+          <option value="">Selecione</option>
+          <option value="driver">Motorista</option>
+          <option value="sender">Remetente</option>
+        </select>
+      </label>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p class="muted">
+      Já possui conta?
+      <a href="{{ url_for('auth.login') }}">Entrar</a>
+    </p>
+  </section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Coletar entregas | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h1>Mercadorias disponíveis</h1>
+        <p class="lead">Selecione uma ou mais entregas para adicionar à sua rota.</p>
+      </div>
+    </div>
+
+    <form method="POST">
+      <div class="list-grid">
+        {% for package in packages %}
+          <label class="package-card checkbox-card">
+            <input type="checkbox" name="package_ids" value="{{ package.id }}">
+            <span class="details">
+              <span class="card-title">{{ package.description }}</span>
+              <span><strong>Destinatário:</strong> {{ package.recipient }}</span>
+              <span><strong>Origem:</strong> {{ package.origin_address }}</span>
+              <span><strong>Destino:</strong> {{ package.destination_address }}</span>
+              {% if package.route_distance and package.route_duration %}
+                <span><strong>Distância:</strong> {{ package.route_distance }} km</span>
+                <span><strong>Tempo estimado:</strong> {{ package.route_duration }} minutos</span>
+              {% endif %}
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+
+      <div class="footer-actions">
+        <button type="submit">Coletar selecionadas</button>
+        <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

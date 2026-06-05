@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Editar motorista | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Editar motorista</h1>
+
+    <form class="form-grid" method="POST">
+      <label>
+        Nome
+        <input type="text" name="name" value="{{ driver.name }}" required>
+      </label>
+
+      <label>
+        Telefone
+        <input type="text" name="phone" value="{{ driver.phone }}" required>
+      </label>
+
+      <label class="full">
+        Veículo
+        <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
+      </label>
+
+      <div class="footer-actions full">
+        <button type="submit">Salvar</button>
+        <a class="button secondary" href="{{ url_for('driver.list_drivers') }}">Voltar</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

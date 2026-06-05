@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar motorista | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Cadastrar novo motorista</h1>
+    <p class="lead">Complete seu perfil de motorista para começar a coletar mercadorias disponíveis.</p>
+
+    <form class="form-grid" method="POST">
+      <label>
+        Nome
+        <input type="text" name="name" value="{{ user.name }}" readonly>
+      </label>
+
+      <label>
+        Telefone
+        <input type="text" name="phone" placeholder="(00) 00000-0000" required>
+      </label>
+
+      <label class="full">
+        Veículo
+        <input type="text" name="vehicle" placeholder="Ex: Moto Honda CG, Fiorino branca" required>
+      </label>
+
+      <div class="footer-actions full">
+        <button type="submit">Cadastrar motorista</button>
+        <a class="button secondary" href="{{ url_for('auth.logout') }}">Sair</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}
