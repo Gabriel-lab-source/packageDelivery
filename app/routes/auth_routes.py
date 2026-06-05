@@ -13,12 +13,16 @@ def login():
 
     session.clear()
 
-    user = User.query.filter_by(email=request.form.get("email")).first()
+    if request.method == "POST":
+        user = User.query.filter_by(email=request.form.get("email")).first()
 
-    if user and user.password == request.form.get("password"):
-        session["user_id"] = user.id
-        session["role"] = user.role
-        return redirect("/")
+        if user and user.password == request.form.get("password"):
+            session["user_id"] = user.id
+            session["role"] = user.role
+            return redirect("/")
+
+        flash("Usuário ou senha não encontrado.", "danger")
+
     return render_template("login.html")
 
 

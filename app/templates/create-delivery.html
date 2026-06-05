@@ -1,47 +1,46 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Cadastre sua entrega</title>
-</head>
+{% block title %}Cadastrar entrega | Entrega Fácil{% endblock %}
 
-<body>
-
+{% block content %}
+  <section class="panel">
     <h1>Cadastrar nova entrega</h1>
+    <p class="lead">Preencha os dados da mercadoria, origem e destino para criar uma nova solicitação.</p>
 
-<form method="POST">
+    {% if request.args.get("message") %}
+      <div class="alert success-message">{{ request.args.get("message") }}</div>
+    {% endif %}
 
-    <input type="text" name="description" placeholder="Descrição do item" required>
-    <input type="text" name="sender" value="{{ user.name }}" readonly>
-    <input type="text" name="recipient" placeholder="Destinatário" required>
-    <input type="text" name="origin_address" placeholder="Endereço de origem" required>
-    <input type="text" name="destination_address" placeholder="Endereço de destino" required>
+    <form class="form-grid" method="POST">
+      <label class="full">
+        Descrição do item
+        <input type="text" name="description" placeholder="Ex: caixa pequena, documento, produto frágil" required>
+      </label>
 
-    <br><br>
+      <label>
+        Remetente
+        <input type="text" name="sender" value="{{ user.name }}" readonly>
+      </label>
 
-    <button type="submit">Cadastrar</button>
+      <label>
+        Destinatário
+        <input type="text" name="recipient" placeholder="Nome do destinatário" required>
+      </label>
 
-</form>
+      <label>
+        Endereço de origem
+        <input type="text" name="origin_address" placeholder="Rua, número, bairro e cidade" required>
+      </label>
 
-{% if request.args.get("message") %}
-    <p style="color: green;">
-        {{ request.args.get("message") }}
-    </p>
-{% endif %}
+      <label>
+        Endereço de destino
+        <input type="text" name="destination_address" placeholder="Rua, número, bairro e cidade" required>
+      </label>
 
-<p>
-    <a href="{{ url_for('main.home') }}">
-        <button>Voltar</button>
-    </a>
-</p>
-
-{% if session.get("user_id") %}
-    <a href="{{ url_for('auth.logout') }}">
-        <button>Sair</button>
-    </a>
-{% endif %}
-
-</body>
-
-</html>
+      <div class="footer-actions full">
+        <button type="submit">Cadastrar entrega</button>
+        <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

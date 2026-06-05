@@ -3,7 +3,7 @@ from app.models.delivery import Delivery
 from app.models.user import User
 from app.services.geolocation import get_coordinates, get_route
 from sqlalchemy import select
-from flask import request, jsonify, render_template, redirect, url_for, Blueprint, session
+from flask import request, jsonify, render_template, redirect, url_for, Blueprint, session, flash
 
 sender_bp = Blueprint(
     "sender",
@@ -24,12 +24,20 @@ def insert_delivery():
         origin_lat, origin_lng = get_coordinates(request.form.get("origin_address"))
         destination_lat, destination_lng = get_coordinates(request.form.get("destination_address"))
 
+        if None in (origin_lat, origin_lng, destination_lat, destination_lng):
+            flash("Não foi possível encontrar um dos endereços informados.", "danger")
+            return render_template("create-delivery.html", user=user)
+
         route = get_route(
             origin_lat,
             origin_lng,
             destination_lat,
             destination_lng
         )
+
+        if not route:
+            flash("Não foi possível calcular a rota entre os endereços informados.", "danger")
+            return render_template("create-delivery.html", user=user)
 
         delivery = Delivery(
             description=request.form.get("description"),
@@ -123,6 +131,9 @@ def delete_deliveries(id):
 @sender_bp.route("/sender-deliveries", methods=["GET"])
 def sender_deliveries():
 
+    if "user_id" not in session or session["role"] != "sender":
+        return redirect("/login")
+
     user = db.session.get(User, session["user_id"])
 
     if not user:
@@ -130,7 +141,23 @@ def sender_deliveries():
 
     deliveries = Delivery.query.filter_by(sender=user.name).all()
 
-    if not deliveries:
-        return {"error": "deliveries not found"}, 404
+    pending_deliveries = [
+        delivery for delivery in deliveries
+        if delivery.status == "pending"
+    ]
+    in_progress_deliveries = [
+        delivery for delivery in deliveries
+        if delivery.status == "in_progress"
+    ]
+    delivered_deliveries = [
+        delivery for delivery in deliveries
+        if delivery.status == "delivered"
+    ]
 
-    return render_template("sender-deliveries.html", deliveries=deliveries)
+    return render_template(
+        "sender-deliveries.html",
+        deliveries=deliveries,
+        pending_deliveries=pending_deliveries,
+        in_progress_deliveries=in_progress_deliveries,
+        delivered_deliveries=delivered_deliveries
+    )

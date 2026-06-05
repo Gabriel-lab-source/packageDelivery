@@ -1,88 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Entregas do motorista</title>
-</head>
-<body>
-  <h1>Entregas do motorista</h1>
+{% extends "base.html" %}
 
-  <h2>Entregas em andamento:</h2>
+{% block title %}Entregas do motorista | Entrega Fácil{% endblock %}
 
-  {% for delivery in deliveries %}
+{% block content %}
+  <section class="panel">
+    <h1>Entregas do motorista</h1>
+    <p class="lead">Veja suas entregas em andamento e as entregas já finalizadas.</p>
 
-    {% if delivery.status == "in_progress" %}
+    <h2>Em andamento</h2>
+    <div class="list-grid">
+      {% for delivery in deliveries %}
+        {% if delivery.status == "in_progress" %}
+          <article class="delivery-card">
+            <div class="card-title">
+              <span>Entrega #{{ delivery.id }}</span>
+              <span class="badge">Em rota</span>
+            </div>
 
-      <div style="border:1px solid black; margin:10px; padding:10px;">
+            <div class="details">
+              <p><strong>Remetente:</strong> {{ delivery.sender }}</p>
+              <p><strong>Destinatário:</strong> {{ delivery.recipient }}</p>
+              <p><strong>Origem:</strong> {{ delivery.origin_address }}</p>
+              <p><strong>Destino:</strong> {{ delivery.destination_address }}</p>
+              {% if delivery.route_distance and delivery.route_duration %}
+                <p><strong>Distância restante:</strong> {{ delivery.route_distance }} km</p>
+                <p><strong>Tempo estimado:</strong> {{ delivery.route_duration }} minutos</p>
+              {% endif %}
+            </div>
 
-        <p>ID: {{ delivery.id }}</p>
+            <div class="footer-actions">
+              <a class="button secondary" href="{{ url_for('driver.get_real_eta', id=delivery.id) }}">
+                Ver rota
+              </a>
+              <form class="inline-form" method="POST">
+                <button type="submit">Finalizar entrega</button>
+              </form>
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
 
-        <p>Remetente: {{ delivery.sender }}</p>
+    <h2>Finalizadas</h2>
+    <div class="list-grid">
+      {% for delivery in deliveries %}
+        {% if delivery.status == "delivered" %}
+          <article class="delivery-card delivered">
+            <div class="card-title">
+              <span>Entrega #{{ delivery.id }}</span>
+              <span class="badge done">Entregue</span>
+            </div>
 
-        <p>Destinatário: {{ delivery.recipient }}</p>
+            <div class="details">
+              <p><strong>Remetente:</strong> {{ delivery.sender }}</p>
+              <p><strong>Destinatário:</strong> {{ delivery.recipient }}</p>
+              <p><strong>Origem:</strong> {{ delivery.origin_address }}</p>
+              <p><strong>Destino:</strong> {{ delivery.destination_address }}</p>
+              {% if delivery.route_distance and delivery.route_duration %}
+                <p><strong>Distância final:</strong> {{ delivery.route_distance }} km</p>
+                <p><strong>Tempo estimado:</strong> {{ delivery.route_duration }} minutos</p>
+              {% endif %}
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
 
-        <p>Status: {{ delivery.status }}</p>
-
-        <p>Endereço de origem: {{ delivery.origin_address }}</p>
-
-        <p>Endereço de destino: {{ delivery.destination_address }}</p>
-
-        <a href="{{ url_for('driver.get_real_eta', id=delivery.id) }}">
-          <button>
-            Ver distância e tempo estimado de entrega
-          </button>
-        </a>
-
-        <form method="POST">
-          <button type="submit">
-            Finalizar entrega
-          </button>
-        </form>
-
-      </div>
-
-    {% endif %}
-
-  {% endfor %}
-
-
-  <h2>Entregas finalizadas:</h2>
-
-  {% for delivery in deliveries %}
-
-    {% if delivery.status == "delivered" %}
-
-      <div style="border:1px solid gray; margin:10px; padding:10px;">
-
-        <p>ID: {{ delivery.id }}</p>
-
-        <p>Remetente: {{ delivery.sender }}</p>
-
-        <p>Destinatário: {{ delivery.recipient }}</p>
-
-        <p>Status: {{ delivery.status }}</p>
-
-        <p>Endereço de origem: {{ delivery.origin_address }}</p>
-
-        <p>Endereço de destino: {{ delivery.destination_address }}</p>
-
-      </div>
-
-    {% endif %}
-
-  {% endfor %}
-
-  <p>
-      <a href="{{ url_for('main.home') }}">
-          <button>Voltar</button>
-      </a>
-  </p>
-
-  {% if session.get("user_id") %}
-      <a href="{{ url_for('auth.logout') }}">
-          <button>Sair</button>
-      </a>
-  {% endif %}
-
-</body>
-</html>
+    <div class="footer-actions">
+      <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+    </div>
+  </section>
+{% endblock %}

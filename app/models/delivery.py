@@ -40,6 +40,8 @@ class Delivery(db.Model):
             "status": self.status,
             "current_lat": self.current_lat,
             "current_lng": self.current_lng,
+            "route_distance": self.route_distance,
+            "route_duration": self.route_duration,
             "driver_id": self.driver_id,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }

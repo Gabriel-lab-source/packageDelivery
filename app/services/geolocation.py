@@ -1,7 +1,25 @@
 import requests
 
 
+def _to_float(value):
+    if value is None:
+        return None
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def get_route(lat1, lon1, lat2, lon2):
+    lat1 = _to_float(lat1)
+    lon1 = _to_float(lon1)
+    lat2 = _to_float(lat2)
+    lon2 = _to_float(lon2)
+
+    if None in (lat1, lon1, lat2, lon2):
+        return None
+
     url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
     headers = {
@@ -16,7 +34,10 @@ def get_route(lat1, lon1, lat2, lon2):
         ]
     }
 
-    response = requests.post(url, json=body, headers=headers)
+    try:
+        response = requests.post(url, json=body, headers=headers, timeout=15)
+    except requests.RequestException:
+        return None
 
     if response.status_code != 200:
         return None
@@ -48,7 +69,10 @@ def get_coordinates(address):
         "User-Agent": "delivery-app"
     }
 
-    response = requests.get(url, params=params, headers=headers)
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=15)
+    except requests.RequestException:
+        return None, None
 
     if response.status_code != 200:
         return None, None
@@ -58,7 +82,7 @@ def get_coordinates(address):
     if not data:
         return None, None
 
-    lat = data[0]["lat"]
-    lon = data[0]["lon"]
+    lat = _to_float(data[0]["lat"])
+    lon = _to_float(data[0]["lon"])
 
     return lat, lon

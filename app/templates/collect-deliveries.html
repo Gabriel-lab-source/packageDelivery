@@ -1,62 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Mercadorias disponíveis para entrega</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Coletar entregas | Entrega Fácil{% endblock %}
 
-    <h1>Mercadorias disponíveis para entrega:</h1>
+{% block content %}
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h1>Mercadorias disponíveis</h1>
+        <p class="lead">Selecione uma ou mais entregas para adicionar à sua rota.</p>
+      </div>
+    </div>
 
     <form method="POST">
-
+      <div class="list-grid">
         {% for package in packages %}
-
-            <div>
-
-                <input 
-                    type="checkbox"
-                    name="package_ids"
-                    value="{{ package.id }}"
-                >
-
-                <strong>Mercadoria:</strong>
-                {{ package.description }}
-
-                <br>
-
-                <strong>Destinatário:</strong>
-                {{ package.recipient }}
-
-                <br>
-
-                <strong>Endereço:</strong>
-                {{ package.address }}
-
-                <br><br>
-
-            </div>
-
+          <label class="package-card checkbox-card">
+            <input type="checkbox" name="package_ids" value="{{ package.id }}">
+            <span class="details">
+              <span class="card-title">{{ package.description }}</span>
+              <span><strong>Destinatário:</strong> {{ package.recipient }}</span>
+              <span><strong>Origem:</strong> {{ package.origin_address }}</span>
+              <span><strong>Destino:</strong> {{ package.destination_address }}</span>
+              {% if package.route_distance and package.route_duration %}
+                <span><strong>Distância:</strong> {{ package.route_distance }} km</span>
+                <span><strong>Tempo estimado:</strong> {{ package.route_duration }} minutos</span>
+              {% endif %}
+            </span>
+          </label>
         {% endfor %}
+      </div>
 
-        <button type="submit">
-            Coletar mercadorias selecionadas
-        </button>
-
+      <div class="footer-actions">
+        <button type="submit">Coletar selecionadas</button>
+        <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+      </div>
     </form>
-
-    <p>
-        <a href="{{ url_for('main.home') }}">
-            <button>Voltar</button>
-        </a>
-    </p>
-
-    {% if session.get("user_id") %}
-        <a href="{{ url_for('auth.logout') }}">
-            <button>Sair</button>
-        </a>
-    {% endif %}
-
-</body>
-</html>
+  </section>
+{% endblock %}

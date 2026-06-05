@@ -1,42 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Bem vindo</title>
-</head>
-<body>
-  <h1>Bem-vindo ao sistema de entregas</h1>
-  <nav>
+{% extends "base.html" %}
 
-  {% if not session.get("user_id") %}
+{% block title %}Bem-vindo | Entrega Fácil{% endblock %}
 
-      <a href="/login">Entrar</a>
-      <a href="/register">Cadastrar</a>
+{% block content %}
+  <section class="panel hero-panel">
+    <div>
+      <h1>Entregas organizadas, do pedido ao destino.</h1>
+      <p class="lead">
+        Acompanhe coletas, cadastre novas entregas e mantenha motoristas e remetentes no mesmo fluxo.
+      </p>
 
-  {% elif session.get("role") == "sender" %}
-
-    <a href="/create-delivery">Criar entrega</a>
-    <a href="/sender-deliveries">Minhas entregas</a>
-    <a href="/logout">Sair da sessão</a>
-
-  {% elif session.get("role") == "driver" %}
-
-      <a href="/collect-deliveries">Coletar entregas</a>
-      <a href="/driver-deliveries">Minhas entregas</a>
-      <a href="/logout">Sair da sessão</a>
-
-  {% endif %}
-
-</nav>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-</body>
-</html>
+      <div class="actions">
+        {% if not session.get("user_id") %}
+          <a class="button" href="{{ url_for('auth.login') }}">Entrar</a>
+          <a class="button secondary" href="{{ url_for('auth.register') }}">Criar conta</a>
+        {% elif session.get("role") == "sender" %}
+          <a class="button" href="{{ url_for('sender.insert_delivery') }}">Nova entrega</a>
+          <a class="button secondary" href="{{ url_for('sender.sender_deliveries') }}">Ver entregas</a>
+        {% elif session.get("role") == "driver" %}
+          <a class="button" href="{{ url_for('driver.collect_deliveries') }}">Coletar entregas</a>
+          <a class="button secondary" href="{{ url_for('driver.driver_deliveries') }}">Minhas entregas</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-icon" aria-hidden="true">↗</div>
+  </section>
+{% endblock %}

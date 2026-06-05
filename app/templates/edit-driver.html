@@ -1,24 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-</head>
-<body>
-    {% if session.get("user_id") %}
-        <a href="{{ url_for('logout') }}">
-            <button>Sair</button>
-        </a>
-    {% endif %}
-    <form method="POST">
-      <input type="text" name="name" value="{{ driver.name }}" required>
-      <input type="text" name="phone" value="{{ driver.phone }}" required>
-      <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
-      <button type="submit">Salvar</button>
+{% extends "base.html" %}
+
+{% block title %}Editar motorista | Entrega Fácil{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Editar motorista</h1>
+
+    <form class="form-grid" method="POST">
+      <label>
+        Nome
+        <input type="text" name="name" value="{{ driver.name }}" required>
+      </label>
+
+      <label>
+        Telefone
+        <input type="text" name="phone" value="{{ driver.phone }}" required>
+      </label>
+
+      <label class="full">
+        Veículo
+        <input type="text" name="vehicle" value="{{ driver.vehicle }}" required>
+      </label>
+
+      <div class="footer-actions full">
+        <button type="submit">Salvar</button>
+        <a class="button secondary" href="{{ url_for('driver.list_drivers') }}">Voltar</a>
+      </div>
     </form>
-
-  <br><br>
-
-</body>
-</html>
-
+  </section>
+{% endblock %}

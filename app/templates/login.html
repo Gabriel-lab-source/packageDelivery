@@ -1,32 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Login</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-  <h1>Login</h1>
+{% block title %}Login | Entrega Fácil{% endblock %}
 
-  <form method="POST">
+{% block content %}
+  <section class="auth-card">
+    <h1>Login</h1>
 
-    <p>
-      <label>Email:</label><br>
-      <input type="email" name="email" required>
+    <form method="POST">
+      <label>
+        Email
+        <input type="email" name="email" required>
+      </label>
+
+      <label>
+        Senha
+        <input type="password" name="password" required>
+      </label>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <p class="muted">
+      Não possui conta?
+      <a href="{{ url_for('auth.register') }}">Cadastre-se</a>
     </p>
-
-    <p>
-      <label>Senha:</label><br>
-      <input type="password" name="password" required>
-    </p>
-
-    <button type="submit">Entrar</button>
-
-  </form>
-
-  <p>
-    Não possui conta?
-    <a href="/register">Cadastre-se</a>
-  </p>
-
-</body>
-</html>
+  </section>
+{% endblock %}

@@ -1,42 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Motoristas cadastrados no sistema</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-    <h1>Lista de Motoristas</h1>
+{% block title %}Motoristas | Entrega Fácil{% endblock %}
 
-    <ul>
-        {% for driver in drivers %}
-            <li>
-                <strong>{{ driver.name }}</strong><br>
-                📞 {{ driver.phone }} <br>
-                🚗 {{ driver.vehicle }} <br><br>
-                
-                <a href="/edit-driver/{{ driver.id }}">Editar</a>
-            
-                <form action="/delete-driver/{{ driver.id }}" method="POST" style="display:inline;">
-                    <button type="submit">Excluir</button>
-                </form>
-            </li>
-        {% endfor %}
-    </ul>
+{% block content %}
+  <section class="panel">
+    <div class="section-header">
+      <div>
+        <h1>Lista de motoristas</h1>
+        <p class="lead">Motoristas cadastrados no sistema.</p>
+      </div>
+    </div>
 
-    <p>
-        <a href="{{ url_for('main.home') }}">
-            <button>Voltar</button>
-        </a>
-    </p>
+    <div class="list-grid">
+      {% for driver in drivers %}
+        <article class="driver-card">
+          <div class="card-title">
+            <span>{{ driver.name }}</span>
+          </div>
 
-    {% if session.get("user_id") %}
-        <a href="{{ url_for('auth.logout') }}">
-            <button>Sair</button>
-        </a>
-    {% endif %}
+          <div class="details">
+            <p><strong>Telefone:</strong> {{ driver.phone }}</p>
+            <p><strong>Veículo:</strong> {{ driver.vehicle }}</p>
+          </div>
 
-</body>
-</html>
+          <div class="footer-actions">
+            <a class="button secondary" href="/edit-driver/{{ driver.id }}">Editar</a>
+            <form class="inline-form" action="/delete-driver/{{ driver.id }}" method="POST">
+              <button class="danger" type="submit">Excluir</button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
 
-
+    <div class="footer-actions">
+      <a class="button secondary" href="{{ url_for('main.home') }}">Voltar</a>
+    </div>
+  </section>
+{% endblock %}

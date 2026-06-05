@@ -1,47 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Cadastro</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-  <h1>Cadastro</h1>
+{% block title %}Cadastro | Entrega Fácil{% endblock %}
 
-  <form method="POST">
+{% block content %}
+  <section class="auth-card">
+    <h1>Cadastro</h1>
 
-    <p>
-      <label>Nome:</label><br>
-      <input type="text" name="name" required>
-    </p>
+    <form method="POST">
+      <label>
+        Nome
+        <input type="text" name="name" required>
+      </label>
 
-    <p>
-      <label>Email:</label><br>
-      <input type="email" name="email" required>
-    </p>
+      <label>
+        Email
+        <input type="email" name="email" required>
+      </label>
 
-    <p>
-      <label>Senha:</label><br>
-      <input type="password" name="password" required>
-    </p>
+      <label>
+        Senha
+        <input type="password" name="password" required>
+      </label>
 
-    <p>
-      <label>Escolha sua função:</label>
+      <label>
+        Escolha sua função
         <select name="role" required>
           <option value="">Selecione</option>
           <option value="driver">Motorista</option>
           <option value="sender">Remetente</option>
         </select>
+      </label>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p class="muted">
+      Já possui conta?
+      <a href="{{ url_for('auth.login') }}">Entrar</a>
     </p>
-
-
-    <button type="submit">Cadastrar</button>
-
-  </form>
-
-  <p>
-    Já possui conta?
-    <a href="/login">Entrar</a>
-  </p>
-
-</body>
-</html>
+  </section>
+{% endblock %}

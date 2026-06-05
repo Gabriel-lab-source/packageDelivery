@@ -96,7 +96,7 @@ def edit_driver(id):
 
         db.session.commit()
 
-        return redirect(url_for("list_drivers"))
+        return redirect(url_for("driver.list_drivers"))
 
     return render_template("edit-driver.html", driver=driver)
 
@@ -111,7 +111,7 @@ def delete_driver(id):
         db.session.delete(driver)
         db.session.commit()
 
-    return redirect(url_for("list_drivers"))
+    return redirect(url_for("driver.list_drivers"))
 
 
 @driver_bp.route("/driver-deliveries", methods=["GET"])
@@ -135,7 +135,7 @@ def get_real_eta(id):
     if not delivery:
         return {"error": "Delivery not found"}, 404
 
-    if not delivery.current_lat:
+    if delivery.current_lat is None or delivery.current_lng is None:
         return {"error": "Current location not available"}, 400
 
     route = get_route(
@@ -147,6 +147,10 @@ def get_real_eta(id):
 
     if not route:
         return {"error": "Could not calculate route"}, 400
+
+    delivery.route_distance = route["distance"]
+    delivery.route_duration = route["duration"]
+    db.session.commit()
 
     return render_template("driver-deliveries-real-eta.html", route=route, delivery=delivery)
 
@@ -163,6 +167,21 @@ def update_delivery_location(id):
     delivery.current_lat = data.get("lat")
     delivery.current_lng = data.get("lng")
 
+    route = get_route(
+        delivery.current_lat,
+        delivery.current_lng,
+        delivery.destination_lat,
+        delivery.destination_lng
+    )
+
+    if route:
+        delivery.route_distance = route["distance"]
+        delivery.route_duration = route["duration"]
+
     db.session.commit()
 
-    return {"message": "Location updated"}
+    return {
+        "message": "Location updated",
+        "route_distance": delivery.route_distance,
+        "route_duration": delivery.route_duration
+    }
